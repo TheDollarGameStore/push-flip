@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
-using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 public enum GameState
@@ -15,6 +12,14 @@ public enum GameState
 
 public class GameManager : MonoBehaviour
 {
+    private long score;
+    private long displayScore;
+
+    private int combo;
+
+    [SerializeField] Text scoreText;
+    [SerializeField] Text comboText;
+
     public static GameManager instance = null;
 
     [HideInInspector] public GameState state;
@@ -48,6 +53,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        combo = 1;
         state = GameState.MOVE;
 
         pieces = new Piece[boardSize, boardSize];
@@ -63,7 +69,7 @@ public class GameManager : MonoBehaviour
             {
                 if (pieces[y, x] == null)
                 {
-                    pieces[y, x] = Instantiate(piecePrefabs[UnityEngine.Random.Range(0, piecePrefabs.Count)], GetPositionByIndex(y, x), Quaternion.identity).GetComponent<Piece>();
+                    pieces[y, x] = Instantiate(GetRandomNonMatchingPiece(x, y), GetPositionByIndex(y, x), Quaternion.identity).GetComponent<Piece>();
                 }
             }
         }
@@ -79,6 +85,40 @@ public class GameManager : MonoBehaviour
     {
         LerpPieces();
         LerpBoard();
+    }
+
+    private void FixedUpdate()
+    {
+        LerpScore();
+    }
+
+    void LerpScore()
+    {
+        if (displayScore < score)
+        {
+            if (score - displayScore > 100)
+            {
+                displayScore += 50;
+            }
+            else if (score - displayScore > 50)
+            {
+                displayScore += 25;
+            }
+            else if (score - displayScore > 20)
+            {
+                displayScore += 20;
+            }
+            else if (score - displayScore > 10)
+            {
+                displayScore += 2;
+            }
+            else
+            {
+                displayScore++;
+            }
+        }
+
+        scoreText.text = displayScore.ToString().PadLeft(8, '0');
     }
 
     void LerpBoard()
@@ -115,7 +155,7 @@ public class GameManager : MonoBehaviour
         pieces[0, pos] = bottomPiece;
         flipper.Flip();
         IncreasePhase();
-        CheckMatches();
+        CheckMatches(true);
     }
 
     public void Flip(int dir)
@@ -179,7 +219,7 @@ public class GameManager : MonoBehaviour
 
 
     //Matching Logic
-    void CheckMatches()
+    bool CheckMatches(bool pop)
     {
         Piece[,] piecesGridDuplicate = (Piece[,])pieces.Clone();
 
@@ -206,23 +246,35 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (groups.Count > 0)
+        if (pop)
         {
-            Invoke("ProcessMatches", 0.2f);
+            if (groups.Count > 0)
+            {
+                combo += 1;
+                Invoke("ProcessMatches", 0.2f);
+            }
+            else
+            {
+                combo = 1;
+                IncreasePhase();
+            }
         }
-        else
-        {
-            IncreasePhase();
-        }
+
+        Invoke("UpdateComboDisplay", 0.2f);
+        return groups.Count > 0;
+    }
+
+    void UpdateComboDisplay()
+    {
+        comboText.text = combo != 1 ? "X " + combo.ToString() : "";
     }
 
     void ProcessMatches()
     {
+        int totalPops = 0;
         for (int i = 0; i < groups.Count; i++)
         {
-            int groupScore = groups[i].Count;
-
-            Debug.Log(groupScore);
+            totalPops += groups[i].Count;
 
             for (int j = 0; j < groups[i].Count; j++)
             {
@@ -232,6 +284,8 @@ public class GameManager : MonoBehaviour
                 pieces[(int)gridPos.y, (int)gridPos.x] = null;
             }
         }
+
+        score += totalPops * 5 * totalPops * combo;
 
         Invoke("FillBoard", 0.2f);
         Invoke("IncreasePhase", 0.2f);
@@ -277,5 +331,32 @@ public class GameManager : MonoBehaviour
         SearchForGroup(color, x - 1, y, group, piecesGridDuplicate);
         SearchForGroup(color, x, y + 1, group, piecesGridDuplicate);
         SearchForGroup(color, x, y - 1, group, piecesGridDuplicate);
+    }
+
+    GameObject GetRandomNonMatchingPiece(int x, int y)
+    {
+        List<GameObject> nonMatchingPieces = new List<GameObject>();
+        foreach (GameObject prefab in piecePrefabs)
+        {
+            GameObject tempPiece = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            tempPiece.GetComponent<Piece>().color = (PieceColor)UnityEngine.Random.Range(0, Enum.GetNames(typeof(PieceColor)).Length);
+            pieces[y, x] = tempPiece.GetComponent<Piece>();
+
+            if (!CheckMatches(false))
+            {
+                nonMatchingPieces.Add(prefab);
+            }
+
+            Destroy(tempPiece);
+        }
+
+        if (nonMatchingPieces.Count > 0)
+        {
+            return nonMatchingPieces[UnityEngine.Random.Range(0, nonMatchingPieces.Count)];
+        }
+        else
+        {
+            return piecePrefabs[UnityEngine.Random.Range(0, piecePrefabs.Count)];
+        }
     }
 }
