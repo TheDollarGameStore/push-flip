@@ -61,7 +61,13 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private CameraBehaviour cameraBehaviour;
 
-    [SerializeField] private Flash flashEffect; 
+    [SerializeField] private Flash flashEffect;
+
+    [SerializeField] private Text highscoreText;
+
+    [SerializeField] private GameObject gameOverIndicator;
+
+    private long highscore;
 
     private void Awake()
     {
@@ -70,6 +76,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        highscore = long.Parse(PlayerPrefs.GetString("Highscore", "0"));
+        highscoreText.text = highscore.ToString();
+
         combo = 1;
         state = GameState.MOVE;
 
@@ -109,7 +118,19 @@ public class GameManager : MonoBehaviour
     void GameOver()
     {
         gameOver = true;
+        if (score > highscore)
+        {
+            PlayerPrefs.SetString("Highscore", score.ToString());
+            gameOverIndicator.GetComponent<Text>().text = "New Highscore!";
+        }
         SoundManager.instance.PlayNormal(gameOverSound);
+        ToggleGameOverText();
+    }
+
+    void ToggleGameOverText()
+    {
+        gameOverIndicator.SetActive(!gameOverIndicator.activeSelf);
+        Invoke("ToggleGameOverText", 1f);
     }
 
     void FillBoard()
