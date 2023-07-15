@@ -23,6 +23,14 @@ public class Player : MonoBehaviour
 
         if (GameManager.instance.gameOver)
         {
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                GameManager.instance.RestartGame();
+            }
+        }
+
+        if (GameManager.instance.gameOver)
+        {
             return;
         }
 

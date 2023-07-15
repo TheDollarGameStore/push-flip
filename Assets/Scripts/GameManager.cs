@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Analytics;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum GameState
 {
@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     private int combo;
 
     private int time = 90;
+
+    private bool canRestart;
 
     [HideInInspector] public bool gameOver;
 
@@ -125,6 +127,20 @@ public class GameManager : MonoBehaviour
         }
         SoundManager.instance.PlayNormal(gameOverSound);
         ToggleGameOverText();
+        Invoke("CanRestart", 2f);
+    }
+
+    public void RestartGame()
+    {
+        if (canRestart && Transitioner.Instance.CanTransition())
+        {
+            Transitioner.Instance.TransitionToScene(0);
+        }
+    }
+
+    void CanRestart()
+    {
+        canRestart = true;
     }
 
     void ToggleGameOverText()
