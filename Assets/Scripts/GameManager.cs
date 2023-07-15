@@ -61,6 +61,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private CameraBehaviour cameraBehaviour;
 
+    [SerializeField] private Flash flashEffect; 
+
     private void Awake()
     {
         instance = this;
@@ -362,6 +364,7 @@ public class GameManager : MonoBehaviour
 
         if (totalPops >= 8)
         {
+            flashEffect.FlashEffect();
             SoundManager.instance.PlayRandom(bigScoreSound);
         }
 
