@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip timerSound;
     [SerializeField] AudioClip gameOverSound;
     [SerializeField] AudioClip scoreSound;
+    [SerializeField] AudioClip bigScoreSound;
 
     public static GameManager instance = null;
 
@@ -144,7 +145,11 @@ public class GameManager : MonoBehaviour
     {
         if (displayScore < score)
         {
-            if (score - displayScore > 100)
+            if (score - displayScore > 500)
+            {
+                displayScore += 250;
+            }
+            else if (score - displayScore > 100)
             {
                 displayScore += 50;
             }
@@ -354,6 +359,11 @@ public class GameManager : MonoBehaviour
         }
 
         score += totalPops * 5 * totalPops * combo;
+
+        if (totalPops >= 8)
+        {
+            SoundManager.instance.PlayRandom(bigScoreSound);
+        }
 
         Invoke("FillBoard", 0.2f);
         Invoke("IncreasePhase", 0.2f);
