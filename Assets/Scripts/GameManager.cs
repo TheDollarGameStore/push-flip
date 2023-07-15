@@ -135,6 +135,7 @@ public class GameManager : MonoBehaviour
     {
         if (canRestart && Transitioner.Instance.CanTransition())
         {
+            SoundManager.instance.PlayNormal(bigScoreSound);
             Transitioner.Instance.TransitionToScene(0);
         }
     }
