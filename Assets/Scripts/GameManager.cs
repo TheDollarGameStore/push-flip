@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text highscoreText;
 
     [SerializeField] private GameObject gameOverIndicator;
+    [SerializeField] private GameObject restartIndicator;
 
     private long highscore;
 
@@ -146,6 +147,7 @@ public class GameManager : MonoBehaviour
     void ToggleGameOverText()
     {
         gameOverIndicator.SetActive(!gameOverIndicator.activeSelf);
+        restartIndicator.SetActive(!restartIndicator.activeSelf);
         Invoke("ToggleGameOverText", 1f);
     }
 
