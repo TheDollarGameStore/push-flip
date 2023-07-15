@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Flipper flipper;
 
+    [SerializeField] private CameraBehaviour cameraBehaviour;
+
     private void Awake()
     {
         instance = this;
@@ -155,6 +157,7 @@ public class GameManager : MonoBehaviour
         pieces[0, pos] = bottomPiece;
         flipper.Flip();
         IncreasePhase();
+        cameraBehaviour.Nudge();
         CheckMatches(true);
     }
 

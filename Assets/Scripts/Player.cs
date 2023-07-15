@@ -5,7 +5,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private int pos;
-    // Start is called before the first frame update
+
+    [SerializeField] private GameObject pushEffect;
+
     void Start()
     {
         pos = Mathf.RoundToInt(GameManager.instance.boardSize / 2f);
@@ -51,6 +53,7 @@ public class Player : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 GameManager.instance.Push(pos);
+                Instantiate(pushEffect, transform.position + (Vector3)(Vector2.up * 20f), Quaternion.identity);
             }
         }
     }
