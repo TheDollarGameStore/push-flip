@@ -17,8 +17,11 @@ public class GameManager : MonoBehaviour
 
     private int combo;
 
+    private int time = 90;
+
     [SerializeField] Text scoreText;
     [SerializeField] Text comboText;
+    [SerializeField] Text timeText;
 
     public static GameManager instance = null;
 
@@ -61,6 +64,15 @@ public class GameManager : MonoBehaviour
         pieces = new Piece[boardSize, boardSize];
         offset = (-(float)boardSize / 2f) + 0.5f;
         FillBoard();
+        Invoke("TickTime", 1f);
+    }
+
+    void TickTime()
+    {
+        time--;
+        timeText.text = time.ToString();
+
+        Invoke("TickTime", 1f);
     }
 
     void FillBoard()
@@ -158,7 +170,7 @@ public class GameManager : MonoBehaviour
         flipper.Flip();
         IncreasePhase();
         cameraBehaviour.Nudge();
-        CheckMatches(true);
+        CheckMatches();
     }
 
     public void Flip(int dir)
@@ -222,7 +234,7 @@ public class GameManager : MonoBehaviour
 
 
     //Matching Logic
-    bool CheckMatches(bool pop)
+    void CheckMatches()
     {
         Piece[,] piecesGridDuplicate = (Piece[,])pieces.Clone();
 
@@ -249,22 +261,40 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (pop)
+        
+        if (groups.Count > 0)
         {
-            if (groups.Count > 0)
+            combo += 1;
+            if (combo > 10)
             {
-                combo += 1;
-                Invoke("ProcessMatches", 0.2f);
+                combo = 10;
             }
-            else
-            {
-                combo = 1;
-                IncreasePhase();
-            }
+            Invoke("ProcessMatches", 0.2f);
+        }
+        else
+        {
+            combo = 1;
+            IncreasePhase();
+        }
+        Invoke("UpdateComboDisplay", 0.2f);
+    }
+
+    bool CheckMatchesForNewPiece(int yCheck, int xCheck)
+    {
+        Piece[,] piecesGridDuplicate = (Piece[,])pieces.Clone();
+
+
+        Piece currentPiece = piecesGridDuplicate[yCheck, xCheck];
+
+        List<Piece> group = new List<Piece> { currentPiece };
+        SearchForGroup(currentPiece.color, xCheck, yCheck, group, piecesGridDuplicate);
+
+        if (group.Count >= 4)
+        {
+            return true;
         }
 
-        Invoke("UpdateComboDisplay", 0.2f);
-        return groups.Count > 0;
+        return false;
     }
 
     void UpdateComboDisplay()
@@ -345,7 +375,7 @@ public class GameManager : MonoBehaviour
             tempPiece.GetComponent<Piece>().color = (PieceColor)UnityEngine.Random.Range(0, Enum.GetNames(typeof(PieceColor)).Length);
             pieces[y, x] = tempPiece.GetComponent<Piece>();
 
-            if (!CheckMatches(false))
+            if (!CheckMatchesForNewPiece(y, x))
             {
                 nonMatchingPieces.Add(prefab);
             }
