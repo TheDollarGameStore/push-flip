@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.UI;
 
 public enum GameState
@@ -19,11 +20,17 @@ public class GameManager : MonoBehaviour
 
     private int time = 90;
 
+    [HideInInspector] public bool gameOver;
+
     [SerializeField] Text scoreText;
     [SerializeField] Text comboText;
     [SerializeField] Text timeText;
     [SerializeField] Sprite redClock;
     [SerializeField] SpriteRenderer clockSr;
+    [SerializeField] Wobble clockWobbler;
+    [SerializeField] AudioClip timerSound;
+    [SerializeField] AudioClip gameOverSound;
+    [SerializeField] AudioClip scoreSound;
 
     public static GameManager instance = null;
 
@@ -66,7 +73,7 @@ public class GameManager : MonoBehaviour
         pieces = new Piece[boardSize, boardSize];
         offset = (-(float)boardSize / 2f) + 0.5f;
         FillBoard();
-        Invoke("TickTime", 1f);
+        Invoke("TickTime", 4f);
     }
 
     void TickTime()
@@ -74,13 +81,32 @@ public class GameManager : MonoBehaviour
         time--;
         timeText.text = time.ToString();
 
-        if (time <= 10)
+        if (time == 10)
         {
+            SoundManager.instance.PlayNormal(timerSound);
             clockSr.sprite = redClock;
             timeText.color = new Color32(255, 0, 77, 255);
         }
 
-        Invoke("TickTime", 1f);
+        if (time <= 10)
+        {
+            clockWobbler.DoTheWobble();
+        }
+
+        if (time != 0)
+        {
+            Invoke("TickTime", 1f);
+        }
+        else
+        {
+            GameOver();
+        }
+    }
+
+    void GameOver()
+    {
+        gameOver = true;
+        SoundManager.instance.PlayNormal(gameOverSound);
     }
 
     void FillBoard()
@@ -273,9 +299,9 @@ public class GameManager : MonoBehaviour
         if (groups.Count > 0)
         {
             combo += 1;
-            if (combo > 10)
+            if (combo > 15)
             {
-                combo = 10;
+                combo = 15;
             }
             Invoke("ProcessMatches", 0.2f);
         }
@@ -312,6 +338,7 @@ public class GameManager : MonoBehaviour
 
     void ProcessMatches()
     {
+        SoundManager.instance.PlayPitched(scoreSound, 0.8f + ((float)combo / 10f));
         int totalPops = 0;
         for (int i = 0; i < groups.Count; i++)
         {

@@ -7,6 +7,9 @@ public class Player : MonoBehaviour
     private int pos;
 
     [SerializeField] private GameObject pushEffect;
+    [SerializeField] private AudioClip move;
+    [SerializeField] private AudioClip push;
+    [SerializeField] private AudioClip flip;
 
     void Start()
     {
@@ -16,6 +19,13 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        transform.position = Vector2.Lerp(transform.position, new Vector2((pos + GameManager.instance.offset) * GameManager.instance.tileSize, transform.position.y), 10f * Time.deltaTime);
+
+        if (GameManager.instance.gameOver)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (GameManager.instance.state == GameState.MOVE)
@@ -23,10 +33,12 @@ public class Player : MonoBehaviour
                 if (pos > 0)
                 {
                     pos--;
+                    SoundManager.instance.PlayRandom(move);
                 }
             }
             else if (GameManager.instance.state == GameState.FLIP)
             {
+                SoundManager.instance.PlayRandom(flip);
                 GameManager.instance.Flip(-1);
             }
         }
@@ -38,21 +50,22 @@ public class Player : MonoBehaviour
                 if (pos < GameManager.instance.boardSize - 1)
                 {
                     pos++;
+                    SoundManager.instance.PlayRandom(move);
                 }
             }
             else if (GameManager.instance.state == GameState.FLIP)
             {
                 GameManager.instance.Flip(1);
+                SoundManager.instance.PlayRandom(flip);
             }
         }
-
-        transform.position = Vector2.Lerp(transform.position, new Vector2((pos + GameManager.instance.offset) * GameManager.instance.tileSize, transform.position.y), 10f * Time.deltaTime);
 
         if (GameManager.instance.state == GameState.MOVE)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 GameManager.instance.Push(pos);
+                SoundManager.instance.PlayRandom(push);
                 Instantiate(pushEffect, transform.position + (Vector3)(Vector2.up * 20f), Quaternion.identity);
             }
         }
