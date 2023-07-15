@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text scoreText;
     [SerializeField] Text comboText;
     [SerializeField] Text timeText;
+    [SerializeField] Sprite redClock;
+    [SerializeField] SpriteRenderer clockSr;
 
     public static GameManager instance = null;
 
@@ -71,6 +73,12 @@ public class GameManager : MonoBehaviour
     {
         time--;
         timeText.text = time.ToString();
+
+        if (time <= 10)
+        {
+            clockSr.sprite = redClock;
+            timeText.color = new Color32(255, 0, 77, 255);
+        }
 
         Invoke("TickTime", 1f);
     }

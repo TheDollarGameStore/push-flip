@@ -1063,6 +1063,8 @@ MonoBehaviour:
   scoreText: {fileID: 1405408693}
   comboText: {fileID: 1311232892}
   timeText: {fileID: 1232085823}
+  redClock: {fileID: 21300000, guid: cab8213680cefb243bdd2bad654566ba, type: 3}
+  clockSr: {fileID: 2080233434}
   state: 0
   boardSize: 5
   tileSize: 18
@@ -1071,6 +1073,7 @@ MonoBehaviour:
   - {fileID: 7566243245426751191, guid: 82e468164f4076b4aaf9dc6de1a8e1de, type: 3}
   - {fileID: 569548058447242868, guid: 5725e1be775c8bd40bedbb641e055291, type: 3}
   - {fileID: 8335947243623776855, guid: 24347c063bf994047ad49169fb7036f2, type: 3}
+  - {fileID: 8732397082955536524, guid: c82fe6d7401546744be83f4d19f4ff06, type: 3}
   board: {fileID: 1796339070}
   offset: 0
   particle: {fileID: 92980254729269287, guid: d16d2347ba1f6434d9e7889f1d8d1af0, type: 3}

@@ -7,7 +7,8 @@ public enum PieceColor
     GREEN,
     BLUE,
     RED,
-    YELLOW
+    YELLOW,
+    PINK
 }
 
 public class Piece : MonoBehaviour
