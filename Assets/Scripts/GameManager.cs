@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip gameOverSound;
     [SerializeField] AudioClip scoreSound;
     [SerializeField] AudioClip bigScoreSound;
+    [SerializeField] AudioClip restartSound;
 
     public static GameManager instance = null;
 
@@ -135,7 +136,7 @@ public class GameManager : MonoBehaviour
     {
         if (canRestart && Transitioner.Instance.CanTransition())
         {
-            SoundManager.instance.PlayNormal(bigScoreSound);
+            SoundManager.instance.PlayNormal(restartSound);
             Transitioner.Instance.TransitionToScene(0);
         }
     }

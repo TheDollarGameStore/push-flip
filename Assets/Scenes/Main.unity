@@ -1616,6 +1616,7 @@ MonoBehaviour:
   gameOverSound: {fileID: 8300000, guid: ed2b6bf1e9cab6b439329f596aa1f9bf, type: 3}
   scoreSound: {fileID: 8300000, guid: 3001f8aa50d3f9e448942dc23a0c8058, type: 3}
   bigScoreSound: {fileID: 8300000, guid: 7057bad9dbe199a44aaab4ecc5b0f988, type: 3}
+  restartSound: {fileID: 8300000, guid: 7098380989a058d4cbacfd4fda7d284a, type: 3}
   state: 0
   boardSize: 5
   tileSize: 18
